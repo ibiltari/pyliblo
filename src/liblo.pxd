@@ -66,7 +66,8 @@ cdef extern from 'lo/lo.h':
     int lo_server_get_socket_fd(lo_server s)
 
     # server thread
-    lo_server_thread lo_server_thread_new_with_proto(char *port, int proto, lo_err_handler err_h)
+    lo_server_thread lo_server_thread_new_multicast(char *group, char *port, lo_err_handler err_h)
+    #lo_server_thread lo_server_thread_new_with_proto(char *port, int proto, lo_err_handler err_h)
     void lo_server_thread_free(lo_server_thread st)
     lo_server lo_server_thread_get_server(lo_server_thread st)
     void lo_server_thread_start(lo_server_thread st)

@@ -685,7 +685,7 @@ cdef class ServerThread(_ServerBase):
     """
     cdef lo_server_thread _server_thread
 
-    def __init__(self, port=None, proto=LO_DEFAULT, **kwargs):
+    def __init__(self, group=None, port=None, iface=None, ip=None, proto=LO_DEFAULT, **kwargs):
         """
         ServerThread(port[, proto])
 
@@ -710,20 +710,48 @@ cdef class ServerThread(_ServerBase):
             if creating the server fails, e.g. because the given port could not
             be opened.
         """
-        cdef char *cs
+        cdef char *cport
 
         if port is not None:
             p = _encode(str(port));
-            cs = p
+            cport = p
         else:
-            cs = NULL
+            cport = NULL
+
+        cdef char *cgroup
+
+        if group is not None:
+            g = _encode(str(group))
+            cgroup = g
+        else: 
+            cgroup = NULL
+
+        cdef char *ciface
+
+        if iface is not None:
+            iif = _encode(str(iface))
+            ciface = iif
+        else: 
+            ciface = NULL
+
+
+        cdef char *cip
+
+        if ip is not None:
+            iip = _encode(str(ip))
+            cip = iip
+        else: 
+            cip = NULL
 
         # make sure python can handle threading
         PyEval_InitThreads()
 
         global __exception
         __exception = None
-        self._server_thread = lo_server_thread_new_with_proto(cs, proto, _err_handler)
+        
+        self._server_thread = lo_server_thread_new_multicast(cgroup, cport, _err_handler)
+
+        #self._server_thread = lo_server_thread_new_with_proto(cport, proto, _err_handler)
         if __exception:
             raise __exception
         self._server = lo_server_thread_get_server(self._server_thread)
